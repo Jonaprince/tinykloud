@@ -1,0 +1,5 @@
+---
+# defaults file for vm-creation
+
+proxmox_user: root@pam
+proxmox_password: password

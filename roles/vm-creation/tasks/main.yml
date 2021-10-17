@@ -1,0 +1,45 @@
+--- 
+
+- name: Clone VM with source vmid and target newid and raw format
+  community.general.proxmox_kvm:
+    api_user: "{{ proxmox_user }}"
+    api_password: "{{ proxmox_password }}"
+    api_host: pve1.metal.ig2h
+    clone: arbitrary_name
+    vmid: "{{ hostvars[item]['template'] }}" 
+    #newid: "{{ item }}"
+    name: "{{ item }}"
+    node: "{{ hostvars[item]['pve'] }}"
+    storage: local-lvm
+    format: raw
+    timeout: 300
+  with_items: "{{ groups['vms'] }}"
+
+- name: Create new VM using Cloud-Init with an ssh key
+  community.general.proxmox_kvm:
+    node: "{{ hostvars[item]['pve'] }}"
+    api_user: "{{ proxmox_user }}" 
+    api_password: "{{ proxmox_password }}"
+    api_host: pve1.metal.ig2h
+    name: "{{ item }}"
+    update: yes
+    ide:
+      ide2: 'local:cloudinit,format=qcow2'
+    searchdomains: 'ig2h'
+    nameservers:
+      - '172.16.0.2'
+      - '172.16.0.1'
+    ipconfig:
+      ipconfig0: "{{ 'ip=' + hostvars[item]['ansible_host'] + '/16,gw=172.16.0.1' }}"
+  with_items: "{{ groups['vms'] }}"
+
+- name: Start VM
+  community.general.proxmox_kvm:
+    api_user: "{{ proxmox_user }}"
+    api_password: "{{ proxmox_password }}" 
+    api_host: pve1.metal.ig2h
+    name: "{{ item }}"
+    node: pve1
+    state: started 
+  with_items: "{{ groups['vms'] }}"
+

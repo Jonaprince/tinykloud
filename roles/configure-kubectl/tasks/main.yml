@@ -1,0 +1,25 @@
+---
+# tasks file for configure-kubectl
+- name: Download kubectl command line
+  become: true
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.2.5/bin/linux/amd64/kubectl
+    dest: /usr/bin
+    mode: '0555'
+  delegate_to: localhost
+
+- name: Download k3s config
+  become: true
+  fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "{{ '/home/' + ansible_user + '/.kube/config' }}"
+    flat: yes
+  delegate_to: "{{ groups.master[0] }}"
+
+
+- name: Explicitly specifying named matched groups
+  ansible.builtin.replace:
+    path: "{{ '/home/' + ansible_user + '/.kube/config' }}"
+    regexp: '127\.0\.0\.1'
+    replace: "{{ hostvars[groups.master[0]]['ansible_default_ipv4']['address'] }}"
+  delegate_to: localhost

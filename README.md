@@ -2,7 +2,6 @@
 
 This project allow to create a little k3s cluster on proxmox with some additional features.
 
-
 ## Requirements
 
 Python3 and python-pip are required packages for installation. You can install python required packages using this command line:
@@ -12,7 +11,6 @@ pip3 install -r requirements.txt
 ```
 
 ## Installation
-
 
 Configure you `host` file with pve the node of your proxmox cluster: 
 
@@ -32,6 +30,12 @@ slave2
 [k3s_cluster:children]
 master
 node
+```
+
+You aso need to defined some group vars:
+```yaml
+proxmox_user: root@pam
+proxmox_password: STRONG_PASSWORD
 ```
 
 Deploy using this command line:

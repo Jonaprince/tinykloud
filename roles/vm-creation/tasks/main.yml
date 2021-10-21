@@ -7,7 +7,6 @@
     api_host: pve1.metal.ig2h
     clone: arbitrary_name
     vmid: "{{ hostvars[item]['template'] }}" 
-    #newid: "{{ item }}"
     name: "{{ item }}"
     node: "{{ hostvars[item]['pve'] }}"
     storage: local-lvm
@@ -42,4 +41,5 @@
     node: pve1
     state: started 
   with_items: "{{ groups['vms'] }}"
+
 

@@ -3,3 +3,11 @@
 
 proxmox_user: root@pam
 proxmox_password: password
+proxmox_api_host: proxmox.domain
+
+gateway: 172.16.0.1
+cidr: "/16"
+
+nameservers:
+- 172.16.0.1
+- 172.16.0.2

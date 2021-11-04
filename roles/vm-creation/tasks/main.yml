@@ -4,7 +4,7 @@
   community.general.proxmox_kvm:
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
-    api_host: pve1.metal.ig2h
+    api_host: "{{ proxmox_api_host }}" 
     clone: arbitrary_name
     vmid: "{{ hostvars[item]['template'] }}" 
     name: "{{ item }}"
@@ -19,24 +19,22 @@
     node: "{{ hostvars[item]['pve'] }}"
     api_user: "{{ proxmox_user }}" 
     api_password: "{{ proxmox_password }}"
-    api_host: pve1.metal.ig2h
+    api_host: "{{ proxmox_api_host }}" 
     name: "{{ item }}"
     update: yes
     ide:
       ide2: 'local:cloudinit,format=qcow2'
     searchdomains: 'ig2h'
-    nameservers:
-      - '172.16.0.2'
-      - '172.16.0.1'
+    nameservers: "{{ nameservers }}"
     ipconfig:
-      ipconfig0: "{{ 'ip=' + hostvars[item]['ansible_host'] + '/16,gw=172.16.0.1' }}"
+      ipconfig0: "{{ 'ip=' + hostvars[item]['ansible_host'] + cidr + ',gw=' + gateway }}"
   with_items: "{{ groups['vms'] }}"
 
 - name: Start VM
   community.general.proxmox_kvm:
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}" 
-    api_host: pve1.metal.ig2h
+    api_host: "{{ proxmox_api_host }}"
     name: "{{ item }}"
     node: pve1
     state: started 

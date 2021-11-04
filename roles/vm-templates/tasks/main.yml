@@ -1,0 +1,8 @@
+---
+- name: download cloud image
+  get_url:
+    url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+    dest: /root/focal-server-cloudimg-amd64.img
+
+- name: Create vm template
+  command: qm create 9000 --memory 2048 --net0 virtio,bridge=vmbr0

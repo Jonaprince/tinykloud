@@ -4,12 +4,13 @@
   hosts: pve
   roles:
   - vm-templates
+  tags: templates
 
 - name: Create Virtual Machine
   hosts: localhost 
   roles:
   - vm-creation
-
+  tags: vms
 
 - name: Check of all vms are up
   hosts: vms
@@ -18,6 +19,7 @@
   - name: Wait for system to become reachable
     wait_for_connection:
       timeout: 100
+  tags: vms
 
 - name: Deploy k3s on Vms
   hosts: k3s_cluster 
@@ -26,4 +28,4 @@
   roles:
   - k3s-install
   - configure-kubectl
-
+  tags: k3s

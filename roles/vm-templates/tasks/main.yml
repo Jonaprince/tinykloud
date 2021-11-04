@@ -19,8 +19,11 @@
 - name: Import cloud init drive
   command: qm set "{{ template }}" --ide2 local-lvm:cloudinit
 
-- name: Set boot disk to first drive
+- name: Set vga serial
   command: qm set "{{ template }}" --serial0 socket --vga serial0
+
+- name: Set default boot drive to cloud image 
+  command: qm set "{{ template }}" --boot c --bootdisk scsi0 
 
 - name: Define virtual machine as a template
   command: qm template "{{ template }}" 

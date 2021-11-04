@@ -1,15 +1,16 @@
 ---
 
-- name: Remove VM
+- name: Stop VMs
   community.general.proxmox_kvm:
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"
     api_host: pve1.metal.ig2h
     name: "{{ item }}"
     state: stopped
+    force: yes
   with_items: "{{ groups['vms'] }}"
 
-- name: Remove VM
+- name: Remove VMs
   community.general.proxmox_kvm:
     api_user: "{{ proxmox_user }}"
     api_password: "{{ proxmox_password }}"

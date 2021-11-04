@@ -1,13 +1,21 @@
 ---
 # defaults file for vm-creation
 
+# Proxmox api configuration 
 proxmox_user: root@pam
 proxmox_password: password
 proxmox_api_host: proxmox.domain
 
+# Network configuration
 gateway: 172.16.0.1
 cidr: "/16"
-
 nameservers:
 - 172.16.0.1
 - 172.16.0.2
+
+# Resources limits
+masters_vcpu: 2
+nodes_vcpu: 1
+
+masters_ram: 8192
+nodes_ram: 4096

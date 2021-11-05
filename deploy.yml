@@ -19,6 +19,11 @@
   - name: Wait for system to become reachable
     wait_for_connection:
       timeout: 100
+  - name: Copy host file to virtual machines
+    become: yes
+    copy:
+      src: /etc/hosts
+      dest: /etc/hosts
   tags: vms
 
 - name: Deploy k3s on Vms

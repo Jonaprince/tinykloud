@@ -11,3 +11,17 @@ nodes_conf = {
     cpu    = {{ nodes.cpu }}
     disk   = "{{ nodes.disk }}"
   }
+
+master_names = [{% for master in groups["master"] -%}
+"{{ master }}"{{ ", " if not loop.last else "" }}
+{%- endfor %}]
+master_ips = [{% for master in groups["master"] -%}
+"{{ masters_ip_start | ipmath(loop.index-1) }}"{{ ", " if not loop.last else "" }}
+{%- endfor %}]
+
+node_names = [{% for node in groups["node"] -%}
+"{{ node }}"{{ ", " if not loop.last else "" }}
+{%- endfor %}]
+node_ips = [{% for master in groups["node"] -%}
+"{{ nodes_ip_start | ipmath(loop.index-1) }}"{{ ", " if not loop.last else "" }}
+{%- endfor %}]

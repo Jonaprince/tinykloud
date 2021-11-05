@@ -18,6 +18,28 @@ variable "pve_names" {
   default = ["pve1","pve"]
 }
 
+variable "master_ips" {
+  type    = list(string)
+  default = ["192.168.1.100","192.168.1.101"]
+}
+
+variable "master_names" {
+  type    = list(string)
+  default = ["master0","master1"]
+}
+
+
+variable "node_ips" {
+  type    = list(string)
+  default = ["192.168.1.100","192.168.1.101"]
+}
+
+variable "node_names" {
+  type    = list(string)
+  default = ["node0","node1"]
+}
+
+
 variable "masters_conf" {
   type = object({
     nb     = number
@@ -50,7 +72,7 @@ variable "nodes_conf" {
 
 resource "proxmox_vm_qemu" "k3s_masters" {
     count             = var.masters_conf.nb
-    name              = "k3s-master-${count.index}"
+    name              = var.master_names[count.index]
     target_node       = var.pve_names[count.index % length(var.pve_names)]
 
     clone             = "VM 800${count.index % length(var.pve_names)}"
@@ -74,12 +96,12 @@ resource "proxmox_vm_qemu" "k3s_masters" {
       storage         = "local-lvm"
   }
   sshkeys = "${file("~/.ssh/id_rsa.pub")}"
-  ipconfig0 = "ip=172.16.13.${count.index}/16,gw=172.16.0.1"
+  ipconfig0 = "ip=${var.master_ips[count.index]}/16,gw=172.16.0.1"
 }
 
 resource "proxmox_vm_qemu" "k3s_nodes" {
     count             = var.nodes_conf.nb
-    name              = "k3s-node-${count.index}"
+    name              = var.node_names[count.index]
     target_node       = var.pve_names[count.index % length(var.pve_names)]
 
     clone             = "VM 800${count.index % length(var.pve_names)}"
@@ -103,5 +125,5 @@ resource "proxmox_vm_qemu" "k3s_nodes" {
       storage         = "local-lvm"
   }
   sshkeys = "${file("~/.ssh/id_rsa.pub")}"
-  ipconfig0 = "ip=172.16.14.${count.index}/16,gw=172.16.0.1"
+  ipconfig0 = "ip=${var.node_ips[count.index]}/16,gw=172.16.0.1"
 }

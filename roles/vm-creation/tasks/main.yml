@@ -33,7 +33,6 @@
     PM_USER: "{{ proxmox_user }}"
     PM_PASS: "{{ proxmox_password }}"
 
-
 #- name: Clone VM with source vmid and target newid and raw format
 #  community.general.proxmox_kvm:
 #    api_user: "{{ proxmox_user }}"

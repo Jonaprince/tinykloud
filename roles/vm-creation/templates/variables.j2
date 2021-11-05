@@ -1,0 +1,13 @@
+masters_conf = {
+    nb = {{ groups['master'] | length }}
+    memory = {{ masters.memory }}
+    cpu    = {{ masters.cpu }}
+    disk   = "{{ masters.disk }}"
+  }
+
+nodes_conf = {
+    nb = {{ groups['node'] | length }}
+    memory = {{ nodes.memory }}
+    cpu    = {{ nodes.cpu }}
+    disk   = "{{ nodes.disk }}"
+  }

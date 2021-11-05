@@ -1,0 +1,11 @@
+localhost 127.0.0.1
+
+# masters
+{% for master in groups["master"] %}
+{{ '172.16.13.0' | ipmath(loop.index-1) }} {{ master }}
+{% endfor %} 
+
+# nodes
+{% for node in groups["node"] %}
+{{ '172.16.14.0' | ipmath(loop.index-1) }} {{ node }}
+{% endfor %} 

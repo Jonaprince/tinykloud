@@ -1,65 +1,102 @@
 --- 
 
-- name: Clone VM with source vmid and target newid and raw format
-  community.general.proxmox_kvm:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: "{{ proxmox_api_host }}" 
-    clone: arbitrary_name
-    vmid: "{{ hostvars[item]['template'] }}" 
-    name: "{{ item }}"
-    node: "{{ hostvars[item]['pve'] }}"
-    storage: local-lvm
-    format: raw
-    timeout: 300
-  with_items: "{{ groups['vms'] }}"
+- name: Copy hosts with ips
+  become: true
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
 
-- name: Create new VM using Cloud-Init with an ssh key
-  community.general.proxmox_kvm:
-    node: "{{ hostvars[item]['pve'] }}"
-    api_user: "{{ proxmox_user }}" 
-    api_password: "{{ proxmox_password }}"
-    api_host: "{{ proxmox_api_host }}" 
-    name: "{{ item }}"
-    update: yes
-    ide:
-      ide2: 'local:cloudinit,format=qcow2'
-    sshkeys: "{{ sshkeys }}"
-    searchdomains: 'ig2h'
-    nameservers: "{{ nameservers }}"
-    cores: "{{ masters_vcpu }}"
-    memory: "{{ masters_ram }}" 
-    ipconfig:
-      ipconfig0: "{{ 'ip=' + hostvars[item]['ansible_host'] + cidr + ',gw=' + gateway }}"
-  with_items: "{{ groups['master'] }}"
+- name: Template a file, using symbolic modes (equivalent to 0644)
+  template:
+    src: variables.j2
+    dest: /tmp/tf/variables.tfvars
+    owner: ubuntu
+    group: ubuntu
+    mode: u=rw,g=r,o=r
 
-- name: Create new VM using Cloud-Init with an ssh key
-  community.general.proxmox_kvm:
-    node: "{{ hostvars[item]['pve'] }}"
-    api_user: "{{ proxmox_user }}" 
-    api_password: "{{ proxmox_password }}"
-    api_host: "{{ proxmox_api_host }}" 
-    name: "{{ item }}"
-    update: yes
-    ide:
-      ide2: 'local:cloudinit,format=qcow2'
-    sshkeys: "{{ sshkeys }}"
-    searchdomains: 'ig2h'
-    nameservers: "{{ nameservers }}"
-    cores: "{{ nodes_vcpu }}"
-    memory: "{{ nodes_ram }}" 
-    ipconfig:
-      ipconfig0: "{{ 'ip=' + hostvars[item]['ansible_host'] + cidr + ',gw=' + gateway }}"
-  with_items: "{{ groups['node'] }}"
+- name: Copy terraform script to terraform inventory
+  copy:
+    src: main.tf 
+    owner: ubuntu
+    group: ubuntu
+    dest: /tmp/tf
 
-- name: Start VM
-  community.general.proxmox_kvm:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}" 
-    api_host: "{{ proxmox_api_host }}"
-    name: "{{ item }}"
-    node: pve1
-    state: started 
-  with_items: "{{ groups['vms'] }}"
+- name: Create vms using terraform
+  command: chdir=/tmp/tf terraform init
+
+- name: Create vms using terraform
+  command: chdir=/tmp/tf terraform apply -var-file="variables.tfvars" -auto-approve
+  environment:
+    PM_USER: "{{ proxmox_user }}"
+    PM_PASS: "{{ proxmox_password }}"
 
 
+#- name: Clone VM with source vmid and target newid and raw format
+#  community.general.proxmox_kvm:
+#    api_user: "{{ proxmox_user }}"
+#    api_password: "{{ proxmox_password }}"
+#    api_host: "{{ proxmox_api_host }}" 
+#    clone: arbitrary_name
+#    vmid: "{{ hostvars[item]['template'] }}" 
+#    name: "{{ item }}"
+#    node: "{{ hostvars[item]['pve'] }}"
+#    storage: local-lvm
+#    format: raw
+#    timeout: 300
+#  with_items: "{{ groups['vms'] }}"
+#
+#- name: Create new VM using Cloud-Init with an ssh key
+#  community.general.proxmox_kvm:
+#    node: "{{ hostvars[item]['pve'] }}"
+#    api_user: "{{ proxmox_user }}" 
+#    api_password: "{{ proxmox_password }}"
+#    api_host: "{{ proxmox_api_host }}" 
+#    name: "{{ item }}"
+#    update: yes
+#    ide:
+#      ide2: 'local:cloudinit,format=qcow2'
+#    sshkeys: "{{ sshkeys }}"
+#    scsi:
+#      storage: scsi0
+#      size: 10
+#    searchdomains: 'ig2h'
+#    nameservers: "{{ nameservers }}"
+#    cores: "{{ masters_vcpu }}"
+#    memory: "{{ masters_ram }}" 
+#    ipconfig:
+#      ipconfig0: "{{ 'ip=' + hostvars[item]['ansible_host'] + cidr + ',gw=' + gateway }}"
+#  with_items: "{{ groups['master'] }}"
+#
+#- name: Create new VM using Cloud-Init with an ssh key
+#  community.general.proxmox_kvm:
+#    node: "{{ hostvars[item]['pve'] }}"
+#    api_user: "{{ proxmox_user }}" 
+#    api_password: "{{ proxmox_password }}"
+#    api_host: "{{ proxmox_api_host }}" 
+#    name: "{{ item }}"
+#    update: yes
+#    ide:
+#      ide2: 'local:cloudinit,format=qcow2'
+#    sshkeys: "{{ sshkeys }}"
+#    searchdomains: 'ig2h'
+#    nameservers: "{{ nameservers }}"
+#    cores: "{{ nodes_vcpu }}"
+#    memory: "{{ nodes_ram }}" 
+#    ipconfig:
+#      ipconfig0: "{{ 'ip=' + hostvars[item]['ansible_host'] + cidr + ',gw=' + gateway }}"
+#  with_items: "{{ groups['node'] }}"
+#
+#- name: Start VM
+#  community.general.proxmox_kvm:
+#    api_user: "{{ proxmox_user }}"
+#    api_password: "{{ proxmox_password }}" 
+#    api_host: "{{ proxmox_api_host }}"
+#    name: "{{ item }}"
+#    node: pve1
+#    state: started 
+#  with_items: "{{ groups['vms'] }}"
+#
+#

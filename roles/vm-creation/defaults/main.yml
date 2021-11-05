@@ -14,8 +14,15 @@ nameservers:
 - 172.16.0.2
 
 # Resources limits
-masters_vcpu: 2
-nodes_vcpu: 1
+masters:
+  cpu: 2
+  memory: 8192
+  disk: "20G"
 
-masters_ram: 8192
-nodes_ram: 4096
+nodes:
+  cpu: 1
+  memory: 4096
+  disk: "10G"
+
+masters_ip_start: 172.16.13.1
+nodes_ip_start: 172.16.14.1

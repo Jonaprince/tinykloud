@@ -1,12 +1,6 @@
 ---
 
 - name: Create Virtual Machine
-  hosts: pve
-  roles:
-  - vm-templates
-  tags: templates
-
-- name: Create Virtual Machine
   hosts: localhost 
   roles:
   - vm-creation

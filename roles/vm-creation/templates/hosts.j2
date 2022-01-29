@@ -1,4 +1,4 @@
-localhost 127.0.0.1
+127.0.0.1 localhost
 
 # masters
 {% for master in groups["master"] %}
@@ -6,6 +6,9 @@ localhost 127.0.0.1
 {% endfor %} 
 
 # nodes
+{% if groups["node"] is defined %}
 {% for node in groups["node"] %}
 {{ nodes_ip_start | ipmath(loop.index-1) }} {{ node }}
 {% endfor %} 
+{% endif %}
+

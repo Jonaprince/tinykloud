@@ -1,0 +1,8 @@
+---
+
+- name: Create Virtual Machine
+  hosts: pve
+  roles:
+  - vm-templates
+  tags: templates
+

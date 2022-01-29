@@ -1,20 +1,7 @@
 ---
 
-- name: Stop VMs
-  community.general.proxmox_kvm:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: pve1.metal.ig2h
-    name: "{{ item }}"
-    state: stopped
-    force: yes
-  with_items: "{{ groups['vms'] }}"
-
-- name: Remove VMs
-  community.general.proxmox_kvm:
-    api_user: "{{ proxmox_user }}"
-    api_password: "{{ proxmox_password }}"
-    api_host: pve1.metal.ig2h
-    name: "{{ item }}"
-    state: absent
-  with_items: "{{ groups['vms'] }}"
+- name: Destroy vms using terraform
+  command: chdir=/tmp/tf terraform destroy -auto-approve
+  environment:
+    PM_USER: "{{ proxmox_user }}"
+    PM_PASS: "{{ proxmox_password }}"

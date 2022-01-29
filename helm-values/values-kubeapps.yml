@@ -1,3 +1,0 @@
-ingress:
-  enabled: true
-  hostname: kubeapps.dev.ig2h

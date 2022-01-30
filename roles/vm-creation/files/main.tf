@@ -31,12 +31,12 @@ variable "master_names" {
 
 variable "node_ips" {
   type    = list(string)
-  default = ["192.168.1.100","192.168.1.101"]
+  default = []
 }
 
 variable "node_names" {
   type    = list(string)
-  default = ["node0","node1"]
+  default = []
 }
 
 
@@ -63,7 +63,7 @@ variable "nodes_conf" {
     disk   = string
   })
   default  = {
-    nb     = 1
+    nb     = 0
     memory = 4096
     cpu    = 2
     disk   = "20G"

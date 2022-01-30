@@ -9,28 +9,40 @@
     group: root
     mode: u=rw,g=r,o=r
 
+
+- name: Add masters hosts lines
+  become: true
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ masters_ip_start | ipmath(idx) + ' ' + item  }}"
+  loop: "{{ groups['master'] }}"
+  tags: test
+  loop_control:
+    index_var: idx 
+
+
 - name: Create terraform directory
   file:
-    path: /tmp/tf/
+    path: "{{ tf_dir }}"
     state: directory
 
 
 - name: Template a file, using symbolic modes (equivalent to 0644)
   template:
     src: variables.j2
-    dest: /tmp/tf/variables.tfvars
+    dest: "{{ tf_dir }}/variables.tfvars"
     mode: u=rw,g=r,o=r
 
 - name: Copy terraform script to terraform inventory
   copy:
     src: main.tf 
-    dest: /tmp/tf
+    dest: "{{ tf_dir }}"
 
 - name: Create vms using terraform
   command: chdir=/tmp/tf terraform init
 
 - name: Create vms using terraform
-  command: chdir=/tmp/tf terraform apply -var-file="variables.tfvars" -auto-approve
+  command: chdir="{{ tf_dir }}" terraform apply -var-file="variables.tfvars" -auto-approve
   environment:
     PM_USER: "{{ proxmox_user }}"
     PM_PASS: "{{ proxmox_password }}"

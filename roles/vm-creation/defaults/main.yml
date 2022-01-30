@@ -26,3 +26,5 @@ nodes:
 
 masters_ip_start: 172.16.13.1
 nodes_ip_start: 172.16.14.1
+
+tf_dir: /tmp/tf 

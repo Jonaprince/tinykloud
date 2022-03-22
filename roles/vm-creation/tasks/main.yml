@@ -39,7 +39,7 @@
     dest: "{{ tf_dir }}"
 
 - name: Create vms using terraform
-  command: chdir=/tmp/tf terraform init
+  command: chdir={{ tf_dir }} terraform init
 
 - name: Create vms using terraform
   command: chdir="{{ tf_dir }}" terraform apply -var-file="variables.tfvars" -auto-approve

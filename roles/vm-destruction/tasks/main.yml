@@ -1,7 +1,7 @@
 ---
 
 - name: Destroy vms using terraform
-  command: chdir=/tmp/tf terraform destroy -auto-approve
+  command: chdir={{ tf_dir }} terraform destroy -auto-approve
   environment:
     PM_USER: "{{ proxmox_user }}"
     PM_PASS: "{{ proxmox_password }}"

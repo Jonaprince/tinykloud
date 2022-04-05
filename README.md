@@ -14,18 +14,23 @@ pip3 install -r requirements.txt
 
 Configure you `host` file with pve the node of your proxmox cluster: 
 
-```
-[vms]
-master1  ansible_host=192.168.0.1    pve=pve1   template=9001
-slave1   ansible_host=192.168.0.2    pve=pve2   template=9002
-slave2   ansible_host=192.168.0.3    pve=pve3   template=9003
+```ini
+[pve]
+pve1.domain ansible_user=root template=8001
+pve2.domain ansible_user=root template=8002
+pve3.domain ansible_user=root template=8003
+
+[vms:children]
+master1  ansible_host=192.168.0.1    pve=pve1   template=8001
+slave1   ansible_host=192.168.0.2    pve=pve2   template=8002
+slave2   ansible_host=192.168.0.3    pve=pve3   template=8003
 
 [master]
-master1
+master1  ansible_host=192.168.0.1    pve=pve1   template=8001
 
 [node]
-slave1
-slave2
+slave1   ansible_host=192.168.0.2    pve=pve2   template=8002
+slave2   ansible_host=192.168.0.3    pve=pve3   template=8003
 
 [k3s_cluster:children]
 master
@@ -36,6 +41,11 @@ You aso need to defined some group vars:
 ```yaml
 proxmox_user: root@pam
 proxmox_password: STRONG_PASSWORD
+
+# Configure with your network configuration
+gateway: "192.168.1.1"
+cidr: "/24"
+sshkeys: "YOUR PUBLIC KEY"
 ```
 
 Deploy using this command line:

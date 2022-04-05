@@ -1,0 +1,29 @@
+---
+- name: download cloud image
+  get_url:
+    url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+    dest: /root/focal-server-cloudimg-amd64.img
+
+- name: Create vm template
+  register: result
+  command: qm create "{{ template }}" --memory 2048 --net0 virtio,bridge=vmbr0
+  failed_when: "False"
+  changed_when: "not 'exist' in result.stderr"
+
+- name: Import cloud image as disk
+  command: qm importdisk "{{ template }}" focal-server-cloudimg-amd64.img local-lvm
+
+- name: Attach disk to template vm
+  command: qm set "{{ template }}" --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-{{ template }}-disk-0
+
+- name: Import cloud init drive
+  command: qm set "{{ template }}" --ide2 local-lvm:cloudinit
+
+- name: Set vga serial
+  command: qm set "{{ template }}" --serial0 socket --vga serial0
+
+- name: Set default boot drive to cloud image 
+  command: qm set "{{ template }}" --boot c --bootdisk scsi0 
+
+- name: Define virtual machine as a template
+  command: qm template "{{ template }}" 

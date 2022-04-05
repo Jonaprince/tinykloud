@@ -1,0 +1,31 @@
+masters_conf = {
+    nb = {{ groups['master'] | length }}
+    memory = {{ masters.memory }}
+    cpu    = {{ masters.cpu }}
+    disk   = "{{ masters.disk }}"
+  }
+
+
+master_names = [{% for master in groups["master"] -%}
+"{{ master }}"{{ ", " if not loop.last else "" }}
+{%- endfor %}]
+master_ips = [{% for master in groups["master"] -%}
+"{{ masters_ip_start | ipmath(loop.index-1) }}"{{ ", " if not loop.last else "" }}
+{%- endfor %}]
+
+{% if groups["node"] is defined %}
+
+node_names = [{% for node in groups["node"] -%}
+"{{ node }}"{{ ", " if not loop.last else "" }}
+{%- endfor %}]
+node_ips = [{% for master in groups["node"] -%}
+"{{ nodes_ip_start | ipmath(loop.index-1) }}"{{ ", " if not loop.last else "" }}
+{%- endfor %}]
+
+nodes_conf = {
+    nb = {{ groups['node'] | length }}
+    memory = {{ nodes.memory }}
+    cpu    = {{ nodes.cpu }}
+    disk   = "{{ nodes.disk }}"
+  }
+{% endif %}
